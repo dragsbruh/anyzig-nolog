@@ -38,6 +38,8 @@ fn anyzigLog(
     comptime format: []const u8,
     args: anytype,
 ) void {
+    if (@intFromEnum(level) > @intFromEnum(std.log.Level.warn)) return;
+
     const scope_level = comptime (switch (scope) {
         .default => switch (level) {
             .info => "",
