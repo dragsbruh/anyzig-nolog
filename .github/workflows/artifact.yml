@@ -27,6 +27,8 @@ jobs:
           - os: ubuntu-latest
             arch: riscv64
           - os: ubuntu-latest
+            arch: s390x
+          - os: ubuntu-latest
             arch: x86
           - os: ubuntu-latest
             arch: x86_64
@@ -34,15 +36,17 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v4
-      - uses: mlugg/setup-zig@v1
-        with:
-          version: 0.14.0
+      - uses: mlugg/setup-zig@v2
       - run: |
           zig build ci --summary all
       - if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64' }}
+        name: getversion
+        id: version
+        run: echo "version=$(cat zig-out/version-release)" >> $GITHUB_OUTPUT
+      - if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64' }}
         uses: actions/upload-artifact@v4
         with:
-          name: anyzig-archives
+          name: anyzig-${{ steps.version.outputs.version }}-archives
           path: |
             zig-out/anyzig-aarch64-linux.tar.gz
             zig-out/anyzig-aarch64-macos.tar.gz
@@ -50,6 +54,7 @@ jobs:
             zig-out/anyzig-arm-linux.tar.gz
             zig-out/anyzig-powerpc64le-linux.tar.gz
             zig-out/anyzig-riscv64-linux.tar.gz
+            zig-out/anyzig-s390x-linux.tar.gz
             zig-out/anyzig-x86-linux.tar.gz
             zig-out/anyzig-x86-windows.zip
             zig-out/anyzig-x86_64-linux.tar.gz
